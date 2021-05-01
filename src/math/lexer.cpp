@@ -233,10 +233,3 @@ auto Lexer::read_number() -> std::string
 	}
 	return number;
 }
-
-int main(int argc, char const *argv[])
-{
-	Lexer l;
-	l.cli();
-	return 0;
-}

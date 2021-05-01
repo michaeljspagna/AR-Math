@@ -33,6 +33,5 @@
             auto cli() -> void;
             auto run(const std::string&) -> std::vector<Token::Token>;
     };
-
     
 #endif /* LEXER_H */
