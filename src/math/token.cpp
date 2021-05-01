@@ -12,7 +12,7 @@ auto Token::token_string(const Token& token) -> std::string
 	return builder;
 }
 
-auto Token::make(Type type, std::string value) -> Token::Token
+auto Token::make(Type type, std::string value) -> Token
 {
 	Token token = {
 		 type
@@ -21,7 +21,7 @@ auto Token::make(Type type, std::string value) -> Token::Token
 	return token;
 }
 
-auto Token::make(Type type, char value) -> Token::Token
+auto Token::make(Type type, char value) -> Token
 {
 	return make(type, std::string(1,value));
 }

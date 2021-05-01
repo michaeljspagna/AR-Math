@@ -5,8 +5,6 @@
 
 /*
  *Constructor
- *
- *
  */
 Lexer::Lexer()
 {	
@@ -18,17 +16,13 @@ Lexer::Lexer()
 
 /*
  *Destructor
- *
- *
  */
 Lexer::~Lexer(){}
 
 /*
  *Runs Lexer Command Line Interface
- *
- *
  */
-void Lexer::cli(){
+auto Lexer::cli() -> void{
 	int i;
 	std::vector<Token::Token> v;
 	std::string input;
@@ -48,7 +42,7 @@ void Lexer::cli(){
  *input: string to tokenize
  *output: vector of tokens generated from input string
  */
-std::vector<Token::Token> Lexer::run(const std::string& input)
+auto Lexer::run(const std::string& input) -> std::vector<Token::Token>
 {
 	std::vector<Token::Token> tokens;
 	Token::Token token;
@@ -65,9 +59,8 @@ std::vector<Token::Token> Lexer::run(const std::string& input)
 /*
  *Sets Lexer buffer
  *input: string to be tokenized
- *
  */
-void Lexer::feed(const std::string& input)
+auto Lexer::feed(const std::string& input) -> void
 {
 	buffer = input;
 	position = -1;
@@ -76,10 +69,9 @@ void Lexer::feed(const std::string& input)
 
 /*
  *Returns the next token of the Lexer buffer
- *
  *output: next buffer token
  */
-Token::Token Lexer::next_token()
+auto Lexer::next_token() -> Token::Token
 {
 	Lexer::skip_whitespace();
 	if(character == '\0'){
@@ -87,19 +79,12 @@ Token::Token Lexer::next_token()
 	}
 
 	Token::Token token;
-	if(Utils::is_alpha(character)){
-		Lexer::identifier(token);
-	}else if(Utils::is_digit(character)){
+	if(Utils::is_digit(character)){
 		Lexer::number(token);
-	}else if(Utils::is_quote(character)){
-		Lexer::string(token);
-	}else if(Utils::is_semicolon(character)){
-		token = Token::make(Type::SEMICOLON, character);
-		Lexer::read_character();
+	}else if(Utils::is_parenthesis(character)){
+		Lexer::parenthesis(token);
 	}else if(Utils::is_operation(character)){
 		Lexer::operation(token);
-	}else if(Utils::is_delimiter(character)){
-		Lexer::delimeter(token);
 	}else{
 		token = Token::make(Type::UNRECOGNIZED, character);
 		Lexer::read_character();
@@ -107,7 +92,7 @@ Token::Token Lexer::next_token()
 
 	if (token.type == Type::UNRECOGNIZED){
 		std::string error = ("ERROR, UNRECOGNIZED VALUE: { " + token.value + " }");
-		Error::throw_error(error, -1, -1);
+		Error::throw_error(error);
 	}
 	
 	return token;
@@ -115,10 +100,8 @@ Token::Token Lexer::next_token()
 
 /*
  *Advances the position marker and updates character
- *
- *
  */
-void Lexer::read_character()
+auto Lexer::read_character() -> void
 {
 	if(position+1 >= buffer.length())
 	{
@@ -131,10 +114,9 @@ void Lexer::read_character()
 
 /*
  *Checks the next character in the buffer
- *
  *output: next character in buffer, '\0' if EoI
  */
-char Lexer::peek_character()
+auto Lexer::peek_character() -> char
 {
 	if(position+1 >= buffer.length()){
 		return '\0';
@@ -144,24 +126,10 @@ char Lexer::peek_character()
 }
 
 /*
- *Skips successive whitespace characters
- *
- *
- */
-void Lexer::skip_whitespace()
-{
-	while(character != '\0' &&
-		 Utils::is_whitespace(character)){
-		Lexer::read_character();
-	}
-}
-
-/*
  *Tokenizes a number
  *input: token to store number token
- *
  */
-void Lexer::number(Token::Token& token)
+auto Lexer::number(Token::Token& token) -> void
 {
 	Type type;
 	std::string value = Lexer::read_number();
@@ -179,104 +147,31 @@ void Lexer::number(Token::Token& token)
 /*
  *Tokenizes an operation
  *input: token to store operation token
- *
  */
-void Lexer::operation(Token::Token& token)
+auto Lexer::operation(Token::Token& token) -> void
 {
 	char next = Lexer::peek_character();
 	switch(character){
-		case '=':
-			switch(next){
-				case '=':
-					token = Token::make(Type::EQUAL, "==");
-					Lexer::read_character();
-				default:
-					token = Token::make(Type::ASSIGN, character);
-			}
+		case '/':
+			token = Token::make(Type::DIVIDE, character);
 			break;
-		case '+':
-			switch(next){
-				case '+':
-					token = Token::make(Type::INCREMENT, "++");
-					Lexer::read_character();
-				case '=':
-					token = Token::make(Type::PLUS_ASSIGN, "+=");
-					Lexer::read_character();
-				default:
-					token = Token::make(Type::PLUS, character);
-			}
+		case '=':
+			token = Token::make(Type::EQUAL, character);
 			break;
 		case '-':
-			switch(next){
-				case '>':
-					token = Token::make(Type::PRINT, "->");
-					Lexer::read_character();
-				case '-':
-					token = Token::make(Type::DECREMENT, "--");
-					Lexer::read_character();
-				case '=':
-					token = Token::make(Type::MINUS_ASSIGN, "-=");
-					Lexer::read_character();
-				default:
-					token = Token::make(Type::MINUS, character);
-			}
-			break;
-		case '*':
-			switch(next){
-				case '*':
-					token = Token::make(Type::POWER, "**");
-					Lexer::read_character();
-				case '=':
-					token = Token::make(Type::MULTIPLY_ASSIGN, "*=");
-					Lexer::read_character();
-				default:
-					token = Token::make(Type::MULTIPLY, character);
-			}
-			break;
-		case '/':
-			switch(next){
-				case '=':
-					token = Token::make(Type::DIVIDE_ASSIGN, "/=");
-					Lexer::read_character();
-				default:
-					token = Token::make(Type::DIVIDE, character);
-			}
+			token = Token::make(Type::MINUS, character);
 			break;
 		case '%':
-			switch(next){
-				case '=':
-					token = Token::make(Type::MODULO_ASSIGN, "%=");
-					Lexer::read_character();
-				default:
-					token = Token::make(Type::MODULO, character);
-			}
+			token = Token::make(Type::MODULO, character);
 			break;
-		case '>':
-			switch(next){
-				case '=':
-					token = Token::make(Type::GREATER_EQUAL, ">=");
-					Lexer::read_character();
-				default:
-					token = Token::make(Type::GREATER, character);
-			}
+		case '*':
+			token = Token::make(Type::MULTIPLY, character);
 			break;
-		case '<':
-			switch(next){
-				case '=':
-					token = Token::make(Type::LESS_EQUAL, "<=");
-					Lexer::read_character();
-				default:
-					token = Token::make(Type::LESS, character);
-			}
+		case '+':
+			token = Token::make(Type::PLUS, character);
 			break;
-		case '!':
-			switch(next){
-				case '=':
-					token = Token::make(Type::NOT_EQUAL, "!=");
-					Lexer::read_character();
-				default:
-					token = Token::make(Type::NOT, character);
-			}
+		case '^':
+			token = Token::make(Type::POWER, character);
 			break;
 		default:
 			token = Token::make(Type::UNRECOGNIZED, "Unknown Operation");
@@ -285,37 +180,15 @@ void Lexer::operation(Token::Token& token)
 }
 
 /*
- *Tokenizes a delimeter
- *input: token to store delimeter token
- *
+ *Tokenizes a paren
+ *input: token to store paren token
  */
-void Lexer::delimeter(Token::Token& token)
+auto Lexer::parenthesis(Token::Token& token) -> void
 {
 	char next = Lexer::peek_character();
 	switch(character){
-		case '#':
-			token = Token::make(Type::END_OF_INPUT, '\0');
-			buffer = "";
-			position = 0;
-			character = ' ';
-			break;
-		case ',':
-			token = Token::make(Type::COMMA, character);
-			break;
-		case '{':
-			token = Token::make(Type::LEFT_BRACE, character);
-			break;
-		case '[':
-			token = Token::make(Type::LEFT_BRACKET, character);
-			break;
 		case '(':
 			token = Token::make(Type::LEFT_PAREN, character);
-			break;
-		case '}':
-			token = Token::make(Type::RIGHT_BRACE, character);
-			break;
-		case ']':
-			token = Token::make(Type::RIGHT_BRACKET, character);
 			break;
 		case ')':
 			token = Token::make(Type::RIGHT_PAREN, character);
@@ -327,24 +200,38 @@ void Lexer::delimeter(Token::Token& token)
 }
 
 /*
+ *Skips successive whitespace characters
+ */
+auto Lexer::skip_whitespace() -> void
+{
+	while(character != '\0' &&
+		 Utils::is_whitespace(character)){
+		Lexer::read_character();
+	}
+}
+
+/*
  *Reads a sequention decimal or integer
- *
  *output: number
  */
-std::string Lexer::read_number()
+auto Lexer::read_number() -> std::string
 {
 	bool found_dot = false;
-	std::string identifier = "";
-	while(Utils::is_digit(character) ||
-		 Utils::is_dot(character)){
+	std::string number = "";
+	while(Utils::is_digit(character) || Utils::is_dot(character) 
+									 ||	Utils::is_comma(character)){
+		if(Utils::is_comma(character)){
+			Lexer::read_character();
+			continue;
+		}
 		if(Utils::is_dot(character)){
 			if(found_dot) return "\0";
 			found_dot = true;
 		}
-		identifier += character;
+		number += character;
 		Lexer::read_character();
 	}
-	return identifier;
+	return number;
 }
 
 int main(int argc, char const *argv[])

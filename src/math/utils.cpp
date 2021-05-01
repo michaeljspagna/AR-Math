@@ -2,12 +2,21 @@
 #include "utils.hpp"
 
 /*
- * Returns true if input character is an alphabetic or underscore character [a-z|A-Z|_]
- * Returns false if input character is not an alphabetic or underscore character
+ * Returns true if input character is an alphabetic
+ * Returns false if input character is not an alphabeticcharacter
  */
 auto Utils::is_alpha(const char character) -> bool
 {
 	return std::isalpha(character);
+}
+
+/*
+ * Returns true if input character is a comma
+ * Returns false if input character is not a comma
+ */
+auto Utils::is_comma(const char character) -> bool
+{
+	return character == ',';
 }
 
 /*
@@ -43,7 +52,7 @@ auto Utils::is_operation(char character) -> bool
  * Returns true if input character is a paren character ()
  * Returns false if input character is not a paren character
  */
-auto Utils::is_paren(const char character) -> bool
+auto Utils::is_parenthesis(const char character) -> bool
 {
 	return (character == '(' || character == ')');
 }
@@ -54,5 +63,6 @@ auto Utils::is_paren(const char character) -> bool
  */
 auto Utils::is_whitespace(const char character) -> bool
 {
-	return (character == ' ' || character == ',');
+	return std::isspace(character);
 }
+

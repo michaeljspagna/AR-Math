@@ -15,27 +15,23 @@
             int position;
             char character;
 
-            void feed(const std::string&);
-            Token::Token next_token();
-            void read_character();
-            char peek_character();
-            void skip_whitespace();
-            void identifier(Token::Token&);
-            void number(Token::Token&);
-            void string(Token::Token&);
-            void operation(Token::Token&);
-            void delimeter(Token::Token&);
-            std::string read_identifier();
-            std::string read_number();
-            std::string read_string();
-            Type identifier_type(const std::string&);
+            auto feed(const std::string&) -> void;
+            auto next_token() -> Token::Token;
+            auto read_character() -> void;
+            auto peek_character() -> char;
+            auto number(Token::Token&) -> void;
+            auto operation(Token::Token&) -> void;
+            auto parenthesis(Token::Token&) -> void;
+            
+            auto skip_whitespace() -> void;
+            auto read_number() -> std::string;
 
         public:
             Lexer();
             ~Lexer();
             
-            void cli();
-            std::vector<Token::Token> run(const std::string&);
+            auto cli() -> void;
+            auto run(const std::string&) -> std::vector<Token::Token>;
     };
 
     
