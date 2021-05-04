@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.0)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+project(ARMath)
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+add_executable(ARMath ../src/run.cpp)
+target_link_libraries(ARMath ${OpenCV_LIBS})
